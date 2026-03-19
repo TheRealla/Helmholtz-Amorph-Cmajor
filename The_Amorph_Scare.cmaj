@@ -1,0 +1,94 @@
+// HelmholtzAmorphScare.cmajor
+// Part of TheRealla Ecosystem
+// -----------------------------------------------------------------------------
+
+graph HelmholtzAmorphScare [[ main ]]
+{
+    input stream float targetPitch;
+    input stream float vowelSelect;
+    input stream float eraYear;
+    input stream float amorphFold;
+    input event float calibrateTrigger;
+    
+    output stream float out;
+
+    // --- NODE NETWORK ---
+    node
+    {
+        voices = Voice[16];
+        mixer  = std::mixers::LinearSum (16);
+        masterTube = AmorphTube;
+        eraFilter  = EraDegradation;
+        vinylLayer = VinylEngine;
+    }
+
+    // --- ROUTING ---
+    connection
+    {
+        voices -> mixer -> masterTube -> eraFilter -> out;
+        vinylLayer -> masterTube.sidechain; // Inject noise into the tube stage
+    }
+}
+
+// -----------------------------------------------------------------------------
+// THE AMORPH PRESET MAP (Stored as a Constant Array for Speed)
+// -----------------------------------------------------------------------------
+struct Preset { float year; float dust; float drive; int vowel; bool sag; }
+
+const Preset[30] amorphLibrary = 
+(
+    Preset (2026.0f, 0.0f,  0.1f,  1, false), // 01: Pure Helmholtz
+    Preset (1900.0f, 0.85f, 0.4f,  1, true),  // 02: 1905 Wax Cylinder
+    Preset (1920.0f, 0.45f, 0.8f,  3, true),  // 03: Carbon Mic Shriek
+    Preset (2026.0f, 0.0f,  1.0f,  3, true),  // 11: Folded Resonator
+    // ... logic mapping for the remaining 26 slots
+);
+
+// -----------------------------------------------------------------------------
+// THE CORE ENGINE NODES
+// -----------------------------------------------------------------------------
+
+processor AmorphTube
+{
+    input stream float in, sidechain, drive, sag;
+    output stream float out;
+
+    void main()
+    {
+        loop {
+            float s = in + (sidechain * 0.05f);
+            
+            // Amorph Folding Logic: 
+            // If the voltage (1.0 - sag) is exceeded, the wave mirrors back.
+            if (std::abs(s) > (1.1f - sag)) 
+                s = std::sin (s * 3.14159f);
+
+            out = std::tanh (s * (1.0f + drive * 5.0f));
+            advance();
+        }
+    }
+}
+
+processor EraDegradation
+{
+    input stream float in, year;
+    output stream float out;
+
+    // Internal state for Amorph-optimized filters
+    std::filters::StateVariable hp, lp;
+
+    void main()
+    {
+        loop {
+            // Frequency mapping based on the "Year" dial
+            float lowCut  = std::map (year, 1900.0f, 2026.0f, 420.0f, 20.0f);
+            float highCut = std::map (year, 1900.0f, 2026.0f, 2600.0f, 18000.0f);
+            
+            lp.setCutoff (highCut);
+            hp.setCutoff (lowCut);
+            
+            out = lp.process (hp.process (in));
+            advance();
+        }
+    }
+}
