@@ -1,0 +1,17 @@
+{
+  "name": "Helmholtz Amorph Scare Machine",
+  "version": "1.0.0",
+  "vendor": "TheRealla",
+  "description": "10-Harmonic Additive Vowel Synthesizer with Era Degradation",
+  "category": "Instrument/Synth",
+  "parameters": [
+    {"id": "preset", "name": "Amorph Preset", "type": "choice", "choices": ["01: Pure Helmholtz", "02: 1905 Wax Cylinder", "03: Carbon Mic Shriek", "04: Dust & Bone", "05: The Seance", "06: 1945 Radio Night", "07: Pentode Saturation", "08: Bakelite Vowel", "09: Magnetic Wire", "10: Laboratory Pulse", "11: Folded Resonator", "12: Structural Collapse", "13: Digital Dust", "14: Cmajor Glitch", "15: The Void", "16: Oceanic Wax", "17: Broken Interrupter", "18: Antique 808", "19: Telephone A", "20: Harmonic Tension", "21: Texture Alpha", "22: Texture Beta", "23: Texture Gamma", "24: Texture Delta", "25: Texture Epsilon", "26: Texture Zeta", "27: Texture Eta", "28: Texture Theta", "29: Texture Iota", "30: Total Collapse"]},
+    {"id": "year",   "name": "Era Year", "min": 1900, "max": 2026, "default": 2026},
+    {"id": "vowel",  "name": "Vowel", "type": "choice", "choices": ["-", "A", "E", "I", "O", "U"]},
+    {"id": "drive",  "name": "Amorph Fold", "min": 0.0, "max": 1.0, "default": 0.35},
+    {"id": "dust",   "name": "Vinyl Dust", "min": 0.0, "max": 1.0, "default": 0.2},
+    {"id": "sag",    "name": "Voltage Sag", "type": "bool", "default": true},
+    {"id": "calib",  "name": "Calibrate", "type": "event"}
+  ],
+  "github": "https://github.com/TheRealla/Helmholtz-Amorph-Cmajor"
+}
